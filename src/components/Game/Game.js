@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import styles from 'Game.scss'
+import styles from './Game.scss'
 
 //memory game grid of cards.  Card is shown or hidden based on whether card has been clicked, which changes the classname
 function Cards(props){
