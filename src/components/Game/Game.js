@@ -33,7 +33,7 @@ function getGameData(gameLevel) {
 	let level;
 	if(typeof gameLevel==undefined) level="easy";
 	else level=gameLevel;
-    const encodedURI = encodeURI('http://daniellec.byethost12.com/portfolio/js/numbers.json')
+    const encodedURI = encodeURI('https://danielledc.github.io/match-game-app/numbers.json')
     return fetch(encodedURI)
 		   .then(response => {
 				if(response.status === 200){
