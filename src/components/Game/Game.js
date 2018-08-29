@@ -7,8 +7,8 @@ import styles from './Game.css'
 function Cards(props){
 	return (
 			<div>
-			   <ul className={styles['grid-container']}>
-			   {props.list.map((card, index)=><li key={index} className={props.cardsToMatch.indexOf(index)!=-1 || props.cardsMatched.indexOf(index)!=-1 ? styles['grid-item-show'] : styles['grid-item-hide']} onClick={()=> props.onRevealCard(card, index)}><span className={props.cardsToMatch.indexOf(index)!=-1 || props.cardsMatched.indexOf(index)!=-1 ? styles['show-card'] : styles['hide-card']}>{card}</span></li>)}
+			   <ul className='grid-container'>
+			   {props.list.map((card, index)=><li key={index} className={props.cardsToMatch.indexOf(index)!=-1 || props.cardsMatched.indexOf(index)!=-1 ? 'grid-item-show' : 'grid-item-hide'} onClick={()=> props.onRevealCard(card, index)}><span className={props.cardsToMatch.indexOf(index)!=-1 || props.cardsMatched.indexOf(index)!=-1 ? 'show-card' : 'hide-card'}>{card}</span></li>)}
 			   </ul>
 		   </div>
 	)
@@ -17,9 +17,9 @@ function Cards(props){
 //welcome message to start new game
 function Welcome(props){
      return(
-	     <div className={styles['welcome']}>
-			<h1 className={styles['header']}>Welcome to the Match Game</h1>
-			<div className={styles['placeholder']}>Choose your level</div>
+	     <div className="welcome">
+			<h1 className="header">Welcome to the Match Game</h1>
+			<div className="placeholder">Choose your level</div>
 			<ul>
 				<li><a href="#" id="easy" onClick={()=>props.onChooseLevel("easy")} >Easy</a></li>
 				<li><a href="#" id="hard" onClick={()=>props.onChooseLevel("hard")}>Difficult</a></li>
@@ -146,7 +146,7 @@ class Game extends Component {
 		if(this.state.cards.length>0){
 			if(this.state.gameStarted==true){
 					if(this.state.cardsMatched.length==this.state.cards.length){
-							return (<div className={styles['pre-game']}><a href="#" onClick={()=>{this.playAgain()}}>Play Again!</a> {cardsDiv}
+							return (<div className='pre-game'><a href="#" onClick={()=>{this.playAgain()}}>Play Again!</a> {cardsDiv}
 							</div> )
 					
 					}
@@ -156,7 +156,7 @@ class Game extends Component {
 					)
 			}
 			else{
-				 return(<div className={styles['pre-game']}>Click any card to start game!{cardsDiv}</div> )
+				 return(<div className='pre-game'>Click any card to start game!{cardsDiv}</div> )
 			}
 		}
         else return (
