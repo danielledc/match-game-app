@@ -1,15 +1,28 @@
 import React, { Component } from "react";
 
-import { Welcome } from "Welcome";
-import { Cards } from "Cards";
+import { Welcome } from "./Welcome";
+import { Cards } from "./Cards";
 
-import 'Game.css"';
+import "./Game.css";
+
+//Game component
+export class Game extends Component {
+  state = {
+    cards: [],
+    count: 0,
+    gameStarted: false,
+    cardsToMatch: [],
+    cardsMatched: []
+  };
+    //this.getGame = this.getGame.bind(this);
+    //this.handleRevealCard = this.handleRevealCard.bind(this);
+    //this.handleMatch = this.handleMatch.bind(this);
 
 
-//get game data from API endpoint, and return array of cards matching the level selected
-getGameData = (gameLevel) => {
+  //get game data from API endpoint, and return array of cards matching the level selected
+  getGameData = (gameLevel) => {
   let level;
-  if (typeof gameLevel == undefined) level = "easy";
+  if (typeof gameLevel === undefined) level = "easy";
   else level = gameLevel;
   const encodedURI = encodeURI(
     "https://danielledc.github.io/match-game-app/numbers.json"
@@ -24,7 +37,7 @@ getGameData = (gameLevel) => {
     })
     .then(data => {
       for (var x in data.levels) {
-        if (data.levels[x].difficulty == level)
+        if (data.levels[x].difficulty === level)
           return Promise.resolve(
             data.levels[x].cards.sort((a, b) => 0.5 - Math.random())
           );
@@ -34,23 +47,10 @@ getGameData = (gameLevel) => {
       console.warn(error);
       return null;
     });
-}
-
-//Game component
-export class Game extends Component {
-  state = {
-    cards: [],
-    count: 0,
-    gameStarted: false,
-    cardsToMatch: [],
-    cardsMatched: []
-  };
-    //this.getGame = this.getGame.bind(this);
-    //this.handleRevealCard = this.handleRevealCard.bind(this);
-    //this.handleMatch = this.handleMatch.bind(this);
+  }  
   //when two cards have been clicked call this.handleMatch to determine if match
   componentDidUpdate = () => {
-    if (this.state.count == 2) {
+    if (this.state.count === 2) {
       setTimeout(this.handleMatch, 700);
     }
   }
@@ -83,8 +83,8 @@ export class Game extends Component {
   handleRevealCard = (card, index) => {
     this.setState(currentState => {
       if (
-        this.state.cardsToMatch[0] != index &&
-        this.state.cardsMatched.indexOf(card) == -1
+        this.state.cardsToMatch[0] !== index &&
+        this.state.cardsMatched.indexOf(card) === -1
       )
         return {
           count: currentState.count + 1,
@@ -105,55 +105,37 @@ export class Game extends Component {
     });
   }
   //get the game data and set this.state.cards to data
-  getGame(level) {
-    let gameLevel = level;
-    getGameData(gameLevel).then(cards => {
+  getGame = (level) => {
+    this.getGameData(level).then(cards => {
       this.setState({
         cards
       });
     });
   }
-  
-  renderWelcome = () => {
-    if (this.state.cards.length === 0)
-      return <Welcome onChooseLevel={this.getGame} />
-  }
-
-  renderGame = () => {
-    if (this.state.gameStarted === true) {
-      if (this.state.cardsMatched.length == this.state.cards.length) {
-        return (
-          <div className="pre-game">
-            <a href="#" onClick={() => {this.playAgain();}}>
-              Play Again!
-            </a>
-          </div>
-        );
-      } else renderGamesStarted();
-    }
-  }
-  renderGameStarted = () => {
-    return  (
-      <Cards
-        list={this.state.cards}
-        cardsToMatch={this.state.cardsToMatch}
-        cardsMatched={this.state.cardsMatched}
-        onRevealCard={this.handleRevealCard}
-      />
-     );
-  }
+ 
   //change UI based on state
   render() {
+    const gameStart = this.state.cards.length > 0;
+    const gameOver = gameStart && (this.state.cardsMatched.length === this.state.cards.length);
+    const gameStarted = gameStart && (this.state.gameStarted === false);
+
     return (
-      <div>
-      { this.renderWelcome() }
-      { this.renderGame ()}
-       
-            <div className="pre-game">
-              Click any card to start game!{cardsDiv}
-            </div>
-      </div>
-      );
+      <React.Fragment>
+        { !gameStart && <Welcome chooseLevel={this.getGame}/> }
+        { gameStart && 
+          (<Cards
+            list={this.state.cards}
+            cardsToMatch={this.state.cardsToMatch}
+            cardsMatched={this.state.cardsMatched}
+            onRevealCard={this.handleRevealCard}
+           />) }
+        { gameStarted && <div className="pre-game">Click any card to start game!</div>}
+        { gameOver && 
+          (<div className="pre-game">
+            <a href="#" onClick={() => {this.playAgain();}}>Play Again!</a>
+           </div>)}
+      </React.Fragment>
+    );
   }
  
 }
