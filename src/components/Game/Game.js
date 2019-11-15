@@ -1,65 +1,13 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
 
-import styles from "./Game.css";
+import { Welcome } from "Welcome";
+import { Cards } from "Cards";
 
-//memory game grid of cards.  Card is shown or hidden based on whether card has been clicked, which changes the classname
-function Cards(props) {
-  return (
-    <div>
-      <ul className="grid-container">
-        {props.list.map((card, index) => (
-          <li
-            key={index}
-            className={
-              props.cardsToMatch.indexOf(index) != -1 ||
-              props.cardsMatched.indexOf(index) != -1
-                ? "grid-item-show"
-                : "grid-item-hide"
-            }
-            onClick={() => props.onRevealCard(card, index)}
-          >
-            <span
-              className={
-                props.cardsToMatch.indexOf(index) != -1 ||
-                props.cardsMatched.indexOf(index) != -1
-                  ? "show-card"
-                  : "hide-card"
-              }
-            >
-              {card}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+import 'Game.css"';
 
-//welcome message to start new game
-function Welcome(props) {
-  return (
-    <div className="welcome">
-      <h1 className="header">Welcome to the Match Game</h1>
-      <div className="placeholder">Choose your level</div>
-      <ul>
-        <li>
-          <a href="#" id="easy" onClick={() => props.onChooseLevel("easy")}>
-            Easy
-          </a>
-        </li>
-        <li>
-          <a href="#" id="hard" onClick={() => props.onChooseLevel("hard")}>
-            Difficult
-          </a>
-        </li>
-      </ul>
-    </div>
-  );
-}
 
 //get game data from API endpoint, and return array of cards matching the level selected
-function getGameData(gameLevel) {
+getGameData = (gameLevel) => {
   let level;
   if (typeof gameLevel == undefined) level = "easy";
   else level = gameLevel;
@@ -89,28 +37,25 @@ function getGameData(gameLevel) {
 }
 
 //Game component
-class Game extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      cards: [],
-      count: 0,
-      gameStarted: false,
-      cardsToMatch: [],
-      cardsMatched: []
-    };
-    this.getGame = this.getGame.bind(this);
-    this.handleRevealCard = this.handleRevealCard.bind(this);
-    this.handleMatch = this.handleMatch.bind(this);
-  }
+export class Game extends Component {
+  state = {
+    cards: [],
+    count: 0,
+    gameStarted: false,
+    cardsToMatch: [],
+    cardsMatched: []
+  };
+    //this.getGame = this.getGame.bind(this);
+    //this.handleRevealCard = this.handleRevealCard.bind(this);
+    //this.handleMatch = this.handleMatch.bind(this);
   //when two cards have been clicked call this.handleMatch to determine if match
-  componentDidUpdate() {
+  componentDidUpdate = () => {
     if (this.state.count == 2) {
       setTimeout(this.handleMatch, 700);
     }
   }
   //determine if both cards match. Reset count to 0, and, if cards match, add cards to this.state.cardsMatched.
-  handleMatch() {
+  handleMatch = () => {
     let card1 = this.state.cardsToMatch[0];
     let card2 = this.state.cardsToMatch[1];
 
@@ -135,7 +80,7 @@ class Game extends Component {
     }
   }
   //when card clicked,  make sure it hasn't already been clicked or matched, then add to this.cardsToMatch and increment count
-  handleRevealCard(card, index) {
+  handleRevealCard = (card, index) => {
     this.setState(currentState => {
       if (
         this.state.cardsToMatch[0] != index &&
@@ -149,7 +94,7 @@ class Game extends Component {
     });
   }
   //when all cards have been matched reset state, in order to prompt to play again
-  playAgain() {
+  playAgain = () => {
     this.setState(currentState => {
       return {
         cards: [],
@@ -168,46 +113,47 @@ class Game extends Component {
       });
     });
   }
+  
+  renderWelcome = () => {
+    if (this.state.cards.length === 0)
+      return <Welcome onChooseLevel={this.getGame} />
+  }
 
-  //change UI based on state
-  render() {
-    const cardsDiv = (
-      <div>
-        <Cards
-          list={this.state.cards}
-          cardsToMatch={this.state.cardsToMatch}
-          cardsMatched={this.state.cardsMatched}
-          onRevealCard={this.handleRevealCard}
-        />
-      </div>
-    );
-
-    if (this.state.cards.length > 0) {
-      if (this.state.gameStarted == true) {
-        if (this.state.cardsMatched.length == this.state.cards.length) {
-          return (
-            <div className="pre-game">
-              <a
-                href="#"
-                onClick={() => {
-                  this.playAgain();
-                }}
-              >
-                Play Again!
-              </a>{" "}
-              {cardsDiv}
-            </div>
-          );
-        } else return <div>{cardsDiv}</div>;
-      } else {
+  renderGame = () => {
+    if (this.state.gameStarted === true) {
+      if (this.state.cardsMatched.length == this.state.cards.length) {
         return (
           <div className="pre-game">
-            Click any card to start game!{cardsDiv}
+            <a href="#" onClick={() => {this.playAgain();}}>
+              Play Again!
+            </a>
           </div>
         );
-      }
-    } else return <Welcome onChooseLevel={this.getGame} />;
+      } else renderGamesStarted();
+    }
   }
+  renderGameStarted = () => {
+    return  (
+      <Cards
+        list={this.state.cards}
+        cardsToMatch={this.state.cardsToMatch}
+        cardsMatched={this.state.cardsMatched}
+        onRevealCard={this.handleRevealCard}
+      />
+     );
+  }
+  //change UI based on state
+  render() {
+    return (
+      <div>
+      { this.renderWelcome() }
+      { this.renderGame ()}
+       
+            <div className="pre-game">
+              Click any card to start game!{cardsDiv}
+            </div>
+      </div>
+      );
+  }
+ 
 }
-
-export default Game;
