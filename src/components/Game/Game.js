@@ -14,11 +14,7 @@ export class Game extends Component {
     cardsToMatch: [],
     cardsMatched: []
   };
-    //this.getGame = this.getGame.bind(this);
-    //this.handleRevealCard = this.handleRevealCard.bind(this);
-    //this.handleMatch = this.handleMatch.bind(this);
-
-
+  
   //get game data from API endpoint, and return array of cards matching the level selected
   getGameData = (gameLevel) => {
   let level;
