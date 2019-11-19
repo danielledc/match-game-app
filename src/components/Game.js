@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { Welcome } from "./Welcome";
 import { Cards } from "./Cards";
 
-import "./Game.css";
+import "./styles/Game.css";
 
 //Game component
 export class Game extends Component {
@@ -18,11 +18,11 @@ export class Game extends Component {
   //get game data from API endpoint, and return array of cards matching the level selected
   getGameData = (gameLevel) => {
   let level;
+  const encodedURI = encodeURI("https://danielledc.github.io/match-game-app/numbers.json");
+
   if (typeof gameLevel === undefined) level = "easy";
   else level = gameLevel;
-  const encodedURI = encodeURI(
-    "https://danielledc.github.io/match-game-app/numbers.json"
-  );
+  
   return fetch(encodedURI)
     .then(response => {
       if (response.status === 200) {
@@ -52,13 +52,11 @@ export class Game extends Component {
   }
   //determine if both cards match. Reset count to 0, and, if cards match, add cards to this.state.cardsMatched.
   handleMatch = () => {
-    let card1 = this.state.cardsToMatch[0];
-    let card2 = this.state.cardsToMatch[1];
+    const { cardsToMatch, cards } = this.state;
+    let card1 = cardsToMatch[0];
+    let card2 = cardsToMatch[1];
 
-    if (
-      this.state.cards[this.state.cardsToMatch[0]] ===
-      this.state.cards[this.state.cardsToMatch[1]]
-    ) {
+    if (cards[cardsToMatch[0]] === cards[cardsToMatch[1]]) {
       this.setState(currentState => {
         return {
           count: 0,
@@ -77,11 +75,9 @@ export class Game extends Component {
   }
   //when card clicked,  make sure it hasn't already been clicked or matched, then add to this.cardsToMatch and increment count
   handleRevealCard = (card, index) => {
+    const { cardsToMatch, cardsMatched } = this.state;
     this.setState(currentState => {
-      if (
-        this.state.cardsToMatch[0] !== index &&
-        this.state.cardsMatched.indexOf(card) === -1
-      )
+      if (cardsToMatch[0] !== index && cardsMatched.indexOf(card) === -1)
         return {
           count: currentState.count + 1,
           gameStarted: true,
@@ -111,27 +107,27 @@ export class Game extends Component {
  
   //change UI based on state
   render() {
-    const gameStart = this.state.cards.length > 0;
-    const gameOver = gameStart && (this.state.cardsMatched.length === this.state.cards.length);
-    const gameStarted = gameStart && (this.state.gameStarted === false);
+    const { cards, cardsMatched, gameStarted, cardsToMatch } = this.state
+    const gameStart = cards.length > 0;
+    const gameOver = gameStart && (cardsMatched.length === cards.length);
+    const newGame = gameStart && (gameStarted === false);
 
     return (
       <React.Fragment>
         { !gameStart && <Welcome chooseLevel={this.getGame}/> }
         { gameStart && 
           (<Cards
-            list={this.state.cards}
-            cardsToMatch={this.state.cardsToMatch}
-            cardsMatched={this.state.cardsMatched}
+            list={cards}
+            cardsToMatch={cardsToMatch}
+            cardsMatched={cardsMatched}
             onRevealCard={this.handleRevealCard}
            />) }
-        { gameStarted && <div className="pre-game">Click any card to start game!</div>}
+        { newGame && <div className="pre-game">Click any card to start game!</div>}
         { gameOver && 
           (<div className="pre-game">
-            <a href="#" onClick={() => {this.playAgain();}}>Play Again!</a>
+            <a href="#/" onClick={() => {this.playAgain();}}>Play Again!</a>
            </div>)}
       </React.Fragment>
     );
-  }
- 
+  } 
 }
